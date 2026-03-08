@@ -210,12 +210,13 @@
 
   .hero-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-    gap: 6px;
+    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
+    gap: 4px;
     flex: 1;
     overflow-y: auto;
     padding-right: 4px;
     min-height: 0;
+    align-content: start;
   }
   .hero-grid::-webkit-scrollbar { width: 4px; }
   .hero-grid::-webkit-scrollbar-track { background: #0a0a0f; }
@@ -225,8 +226,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 6px 4px;
-    border-radius: 6px;
+    padding: 4px 2px;
+    border-radius: 5px;
     background: #111118;
     border: 1px solid #1a1a2e;
     cursor: pointer;
@@ -236,19 +237,19 @@
   .hero-card:hover:not(.picked):not(.banned) {
     border-color: #333;
     background: #16161f;
-    transform: translateY(-2px);
+    transform: translateY(-1px);
   }
   .hero-card img {
-    width: 48px;
-    height: 48px;
-    border-radius: 6px;
-    margin-bottom: 4px;
+    width: 40px;
+    height: 40px;
+    border-radius: 5px;
+    margin-bottom: 2px;
   }
   .hero-card .name {
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     text-align: center;
     color: #aaa;
-    line-height: 1.2;
+    line-height: 1.1;
     font-weight: 500;
   }
   .hero-card.picked {
