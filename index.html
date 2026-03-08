@@ -6,12 +6,12 @@
 <title>Deadlock Draft Tool</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
+  html, body {
     background: #0a0a0f;
     color: #e0e0e0;
     font-family: 'Segoe UI', system-ui, sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
+    height: 100%;
+    overflow: hidden;
   }
 
   /* Header */
@@ -55,12 +55,22 @@
     padding: 0 10px;
     max-width: 1400px;
     margin: 0 auto;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .main-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
   }
 
   /* Team Panels */
   .team-panel {
     flex: 0 0 200px;
     padding: 10px;
+    overflow-y: auto;
+    min-height: 0;
   }
   .team-panel h2 {
     font-size: 0.85rem;
@@ -169,6 +179,9 @@
     flex: 1;
     padding: 10px;
     min-width: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
   }
   .pool-header {
     display: flex;
@@ -199,9 +212,10 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
     gap: 6px;
-    max-height: calc(100vh - 200px);
+    flex: 1;
     overflow-y: auto;
     padding-right: 4px;
+    min-height: 0;
   }
   .hero-grid::-webkit-scrollbar { width: 4px; }
   .hero-grid::-webkit-scrollbar-track { background: #0a0a0f; }
@@ -386,6 +400,7 @@
 </div>
 
 <!-- Main UI -->
+<div class="main-layout">
 <div class="header">
   <h1>Deadlock Draft</h1>
   <div class="subtitle">Team Practice Tool</div>
@@ -434,6 +449,7 @@
   <button class="btn btn-undo" onclick="undoAction()">Undo</button>
   <button class="btn btn-reset" onclick="resetDraft()">Reset</button>
 </div>
+</div><!-- end main-layout -->
 
 <script>
 const HEROES = [
