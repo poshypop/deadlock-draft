@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deadlock Draft Tool</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0f;
+    color: #e0e0e0;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 18px 10px 10px;
+    background: linear-gradient(180deg, #12121a 0%, #0a0a0f 100%);
+    border-bottom: 1px solid #1a1a2e;
+  }
+  .header h1 {
+    font-size: 1.6rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #c5a44e;
+    text-shadow: 0 0 20px rgba(197, 164, 78, 0.3);
+  }
+  .header .subtitle {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  /* Phase Banner */
+  .phase-banner {
+    text-align: center;
+    padding: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .phase-banner.team-amber { color: #c5a44e; text-shadow: 0 0 10px rgba(197,164,78,0.4); }
+  .phase-banner.team-sapphire { color: #4e8bc5; text-shadow: 0 0 10px rgba(78,139,197,0.4); }
+  .phase-banner.done { color: #4ec55a; }
+
+  /* Draft Area */
+  .draft-container {
+    display: flex;
+    gap: 0;
+    padding: 0 10px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  /* Team Panels */
+  .team-panel {
+    flex: 0 0 200px;
+    padding: 10px;
+  }
+  .team-panel h2 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    border-bottom: 2px solid;
+  }
+  .team-amber h2 { color: #c5a44e; border-color: #c5a44e; }
+  .team-sapphire h2 { color: #4e8bc5; border-color: #4e8bc5; }
+
+  .pick-slot {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    background: #111118;
+    border: 1px solid #1a1a2e;
+    min-height: 40px;
+    transition: all 0.2s;
+  }
+  .pick-slot.active {
+    border-color: #c5a44e;
+    box-shadow: 0 0 8px rgba(197,164,78,0.2);
+  }
+  .team-sapphire .pick-slot.active {
+    border-color: #4e8bc5;
+    box-shadow: 0 0 8px rgba(78,139,197,0.2);
+  }
+  .pick-slot.filled {
+    border-color: #2a2a3e;
+  }
+  .pick-slot img {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+  }
+  .pick-slot .slot-label {
+    font-size: 0.7rem;
+    color: #444;
+    text-transform: uppercase;
+  }
+  .pick-slot .hero-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  .team-amber .hero-name { color: #c5a44e; }
+  .team-sapphire .hero-name { color: #4e8bc5; }
+
+  /* Ban Slots */
+  .ban-section h3 {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #555;
+    margin: 10px 0 6px;
+  }
+  .ban-slots {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .ban-slot {
+    width: 34px;
+    height: 34px;
+    border-radius: 4px;
+    background: #111118;
+    border: 1px solid #1a1a2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .ban-slot.active {
+    border-color: #c53030;
+    box-shadow: 0 0 6px rgba(197,48,48,0.3);
+  }
+  .ban-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 3px;
+  }
+  .ban-slot.filled::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(200,30,30,0.45);
+  }
+  .ban-slot.filled::before {
+    content: '';
+    position: absolute;
+    width: 140%;
+    height: 2px;
+    background: #c53030;
+    transform: rotate(-45deg);
+    z-index: 1;
+  }
+
+  /* Hero Pool */
+  .hero-pool-container {
+    flex: 1;
+    padding: 10px;
+    min-width: 0;
+  }
+  .pool-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .pool-header h3 {
+    font-size: 0.75rem;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .search-box {
+    background: #111118;
+    border: 1px solid #1a1a2e;
+    color: #e0e0e0;
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    width: 180px;
+    outline: none;
+  }
+  .search-box:focus { border-color: #333; }
+  .search-box::placeholder { color: #444; }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 6px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+  .hero-grid::-webkit-scrollbar { width: 4px; }
+  .hero-grid::-webkit-scrollbar-track { background: #0a0a0f; }
+  .hero-grid::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+
+  .hero-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 4px;
+    border-radius: 6px;
+    background: #111118;
+    border: 1px solid #1a1a2e;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .hero-card:hover:not(.picked):not(.banned) {
+    border-color: #333;
+    background: #16161f;
+    transform: translateY(-2px);
+  }
+  .hero-card img {
+    width: 48px;
+    height: 48px;
+    border-radius: 6px;
+    margin-bottom: 4px;
+  }
+  .hero-card .name {
+    font-size: 0.6rem;
+    text-align: center;
+    color: #aaa;
+    line-height: 1.2;
+    font-weight: 500;
+  }
+  .hero-card.picked {
+    opacity: 0.2;
+    pointer-events: none;
+    border-color: #0a0a0f;
+  }
+  .hero-card.banned {
+    opacity: 0.15;
+    pointer-events: none;
+    border-color: #0a0a0f;
+  }
+  .hero-card.picked-amber {
+    opacity: 0.2;
+    pointer-events: none;
+    border-color: #c5a44e33;
+  }
+  .hero-card.picked-sapphire {
+    opacity: 0.2;
+    pointer-events: none;
+    border-color: #4e8bc533;
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    background: #0d0d14;
+    border-top: 1px solid #1a1a2e;
+  }
+  .btn {
+    padding: 8px 24px;
+    border: 1px solid #1a1a2e;
+    background: #111118;
+    color: #aaa;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.15s;
+  }
+  .btn:hover { background: #1a1a24; color: #ddd; }
+  .btn-reset { border-color: #c53030; color: #c53030; }
+  .btn-reset:hover { background: #1a0a0a; }
+  .btn-undo { border-color: #555; }
+  .btn-start { border-color: #c5a44e; color: #c5a44e; }
+  .btn-start:hover { background: #1a1810; }
+
+  /* Setup Screen */
+  .setup-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(5,5,10,0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .setup-overlay.hidden { display: none; }
+  .setup-box {
+    background: #111118;
+    border: 1px solid #1a1a2e;
+    border-radius: 8px;
+    padding: 30px 40px;
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+  }
+  .setup-box h2 {
+    color: #c5a44e;
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .setup-box p {
+    color: #666;
+    font-size: 0.8rem;
+    margin-bottom: 20px;
+  }
+  .format-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .format-option {
+    padding: 12px 16px;
+    background: #0a0a0f;
+    border: 1px solid #1a1a2e;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+  }
+  .format-option:hover { border-color: #333; }
+  .format-option.selected { border-color: #c5a44e; background: #14130f; }
+  .format-option .fmt-title {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #ddd;
+  }
+  .format-option .fmt-desc {
+    font-size: 0.7rem;
+    color: #666;
+    margin-top: 2px;
+  }
+  .team-names {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .team-names input {
+    flex: 1;
+    background: #0a0a0f;
+    border: 1px solid #1a1a2e;
+    color: #e0e0e0;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    outline: none;
+    text-align: center;
+  }
+  .team-names input:focus { border-color: #333; }
+  .team-names input::placeholder { color: #444; }
+  .team-names .amber-input { border-color: #c5a44e44; }
+  .team-names .amber-input:focus { border-color: #c5a44e; }
+  .team-names .sapphire-input { border-color: #4e8bc544; }
+  .team-names .sapphire-input:focus { border-color: #4e8bc5; }
+
+  /* Timer */
+  .timer {
+    font-size: 1.8rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    margin-top: -4px;
+  }
+  .timer.warning { color: #c5a44e; }
+  .timer.critical { color: #c53030; animation: pulse 0.5s infinite alternate; }
+  @keyframes pulse { to { opacity: 0.5; } }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .draft-container { flex-direction: column; }
+    .team-panel { flex: none; }
+    .hero-grid { max-height: 50vh; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Setup Overlay -->
+<div class="setup-overlay" id="setup">
+  <div class="setup-box">
+    <h2>Deadlock Draft</h2>
+    <p>Team draft practice tool</p>
+    <div class="team-names">
+      <input type="text" class="amber-input" id="amberName" placeholder="Amber Team" maxlength="20">
+      <input type="text" class="sapphire-input" id="sapphireName" placeholder="Sapphire Team" maxlength="20">
+    </div>
+    <div class="format-options">
+      <div class="format-option selected" data-format="standard" onclick="selectFormat(this)">
+        <div class="fmt-title">Standard Draft</div>
+        <div class="fmt-desc">4 bans per team, 6 picks per team (1-2-2-1 snake)</div>
+      </div>
+      <div class="format-option" data-format="quick" onclick="selectFormat(this)">
+        <div class="fmt-title">Quick Draft</div>
+        <div class="fmt-desc">2 bans per team, 6 picks per team</div>
+      </div>
+      <div class="format-option" data-format="nobans" onclick="selectFormat(this)">
+        <div class="fmt-title">No Bans</div>
+        <div class="fmt-desc">Just picks, 6 per team (snake order)</div>
+      </div>
+    </div>
+    <button class="btn btn-start" onclick="startDraft()">Start Draft</button>
+  </div>
+</div>
+
+<!-- Main UI -->
+<div class="header">
+  <h1>Deadlock Draft</h1>
+  <div class="subtitle">Team Practice Tool</div>
+</div>
+<div class="phase-banner" id="phaseBanner">-</div>
+
+<div class="draft-container">
+  <!-- Amber Team -->
+  <div class="team-panel team-amber" id="amberPanel">
+    <h2 id="amberTitle">Amber</h2>
+    <div class="ban-section">
+      <h3>Bans</h3>
+      <div class="ban-slots" id="amberBans"></div>
+    </div>
+    <div style="margin-top:10px">
+      <div id="amberPicks"></div>
+    </div>
+  </div>
+
+  <!-- Hero Pool -->
+  <div class="hero-pool-container">
+    <div class="pool-header">
+      <h3>Hero Pool</h3>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span class="timer" id="timer"></span>
+        <input type="text" class="search-box" id="searchBox" placeholder="Search heroes..." oninput="filterHeroes()">
+      </div>
+    </div>
+    <div class="hero-grid" id="heroGrid"></div>
+  </div>
+
+  <!-- Sapphire Team -->
+  <div class="team-panel team-sapphire" id="sapphirePanel">
+    <h2 id="sapphireTitle">Sapphire</h2>
+    <div class="ban-section">
+      <h3>Bans</h3>
+      <div class="ban-slots" id="sapphireBans"></div>
+    </div>
+    <div style="margin-top:10px">
+      <div id="sapphirePicks"></div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <button class="btn btn-undo" onclick="undoAction()">Undo</button>
+  <button class="btn btn-reset" onclick="resetDraft()">Reset</button>
+</div>
+
+<script>
+const HEROES = [
+  { name: "Abrams", icon: "https://deadlock.wiki/images/e/e0/Abrams.png" },
+  { name: "Apollo", icon: "https://deadlock.wiki/images/1/14/Apollo.png" },
+  { name: "Bebop", icon: "https://deadlock.wiki/images/4/46/Bebop.png" },
+  { name: "Billy", icon: "https://deadlock.wiki/images/9/95/Billy.png" },
+  { name: "Calico", icon: "https://deadlock.wiki/images/7/7b/Calico.png" },
+  { name: "Celeste", icon: "https://deadlock.wiki/images/4/49/Celeste.png" },
+  { name: "The Doorman", icon: "https://deadlock.wiki/images/a/ae/The_Doorman.png" },
+  { name: "Drifter", icon: "https://deadlock.wiki/images/8/89/Drifter.png" },
+  { name: "Dynamo", icon: "https://deadlock.wiki/images/0/05/Dynamo.png" },
+  { name: "Graves", icon: "https://deadlock.wiki/images/6/66/Graves.png" },
+  { name: "Grey Talon", icon: "https://deadlock.wiki/images/8/8b/Grey_Talon.png" },
+  { name: "Haze", icon: "https://deadlock.wiki/images/e/e8/Haze.png" },
+  { name: "Holliday", icon: "https://deadlock.wiki/images/7/7a/Holliday.png" },
+  { name: "Infernus", icon: "https://deadlock.wiki/images/d/d2/Infernus.png" },
+  { name: "Ivy", icon: "https://deadlock.wiki/images/3/3f/Ivy.png" },
+  { name: "Kelvin", icon: "https://deadlock.wiki/images/2/22/Kelvin.png" },
+  { name: "Lady Geist", icon: "https://deadlock.wiki/images/a/a9/Lady_Geist.png" },
+  { name: "Lash", icon: "https://deadlock.wiki/images/b/bb/Lash.png" },
+  { name: "McGinnis", icon: "https://deadlock.wiki/images/d/da/McGinnis.png" },
+  { name: "Mina", icon: "https://deadlock.wiki/images/6/6b/Mina.png" },
+  { name: "Mirage", icon: "https://deadlock.wiki/images/f/fb/Mirage.png" },
+  { name: "Mo & Krill", icon: "https://deadlock.wiki/images/e/e5/Mo_%26_Krill.png" },
+  { name: "Paige", icon: "https://deadlock.wiki/images/2/2f/Paige.png" },
+  { name: "Paradox", icon: "https://deadlock.wiki/images/b/b0/Paradox.png" },
+  { name: "Pocket", icon: "https://deadlock.wiki/images/e/ee/Pocket.png" },
+  { name: "Rem", icon: "https://deadlock.wiki/images/4/4b/Rem.png" },
+  { name: "Seven", icon: "https://deadlock.wiki/images/f/fe/Seven.png" },
+  { name: "Shiv", icon: "https://deadlock.wiki/images/b/b6/Shiv.png" },
+  { name: "Silver", icon: "https://deadlock.wiki/images/0/0b/Silver.png" },
+  { name: "Sinclair", icon: "https://deadlock.wiki/images/5/54/Sinclair.png" },
+  { name: "Venator", icon: "https://deadlock.wiki/images/d/db/Venator.png" },
+  { name: "Victor", icon: "https://deadlock.wiki/images/9/90/Victor.png" },
+  { name: "Vindicta", icon: "https://deadlock.wiki/images/f/f3/Vindicta.png" },
+  { name: "Viscous", icon: "https://deadlock.wiki/images/e/e9/Viscous.png" },
+  { name: "Vyper", icon: "https://deadlock.wiki/images/2/2f/Vyper.png" },
+  { name: "Warden", icon: "https://deadlock.wiki/images/a/a5/Warden.png" },
+  { name: "Wraith", icon: "https://deadlock.wiki/images/7/7c/Wraith.png" },
+  { name: "Yamato", icon: "https://deadlock.wiki/images/6/64/Yamato.png" },
+];
+
+// Draft formats: sequence of { type: 'ban'|'pick', team: 'amber'|'sapphire' }
+const FORMATS = {
+  standard: {
+    bansPerTeam: 4,
+    picksPerTeam: 6,
+    sequence: [
+      // Ban phase 1: alternating
+      { type:'ban', team:'amber' }, { type:'ban', team:'sapphire' },
+      { type:'ban', team:'amber' }, { type:'ban', team:'sapphire' },
+      // Pick phase 1: 1-2-2-1
+      { type:'pick', team:'amber' }, { type:'pick', team:'sapphire' },
+      { type:'pick', team:'sapphire' }, { type:'pick', team:'amber' },
+      // Ban phase 2
+      { type:'ban', team:'amber' }, { type:'ban', team:'sapphire' },
+      { type:'ban', team:'amber' }, { type:'ban', team:'sapphire' },
+      // Pick phase 2: 2-2
+      { type:'pick', team:'amber' }, { type:'pick', team:'amber' },
+      { type:'pick', team:'sapphire' }, { type:'pick', team:'sapphire' },
+      // Pick phase 3: 2-2
+      { type:'pick', team:'sapphire' }, { type:'pick', team:'sapphire' },
+      { type:'pick', team:'amber' }, { type:'pick', team:'amber' },
+    ]
+  },
+  quick: {
+    bansPerTeam: 2,
+    picksPerTeam: 6,
+    sequence: [
+      { type:'ban', team:'amber' }, { type:'ban', team:'sapphire' },
+      { type:'ban', team:'amber' }, { type:'ban', team:'sapphire' },
+      { type:'pick', team:'amber' }, { type:'pick', team:'sapphire' },
+      { type:'pick', team:'sapphire' }, { type:'pick', team:'amber' },
+      { type:'pick', team:'amber' }, { type:'pick', team:'sapphire' },
+      { type:'pick', team:'sapphire' }, { type:'pick', team:'amber' },
+      { type:'pick', team:'amber' }, { type:'pick', team:'sapphire' },
+      { type:'pick', team:'sapphire' }, { type:'pick', team:'amber' },
+    ]
+  },
+  nobans: {
+    bansPerTeam: 0,
+    picksPerTeam: 6,
+    sequence: [
+      { type:'pick', team:'amber' }, { type:'pick', team:'sapphire' },
+      { type:'pick', team:'sapphire' }, { type:'pick', team:'amber' },
+      { type:'pick', team:'amber' }, { type:'pick', team:'sapphire' },
+      { type:'pick', team:'sapphire' }, { type:'pick', team:'amber' },
+      { type:'pick', team:'amber' }, { type:'pick', team:'sapphire' },
+      { type:'pick', team:'sapphire' }, { type:'pick', team:'amber' },
+    ]
+  }
+};
+
+let state = {
+  format: 'standard',
+  step: 0,
+  amberBans: [],
+  sapphireBans: [],
+  amberPicks: [],
+  sapphirePicks: [],
+  history: [],
+  amberName: 'Amber',
+  sapphireName: 'Sapphire',
+  timerValue: 30,
+  timerInterval: null,
+};
+
+function selectFormat(el) {
+  document.querySelectorAll('.format-option').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected');
+  state.format = el.dataset.format;
+}
+
+function startDraft() {
+  state.amberName = document.getElementById('amberName').value || 'Amber';
+  state.sapphireName = document.getElementById('sapphireName').value || 'Sapphire';
+  document.getElementById('setup').classList.add('hidden');
+  initDraft();
+}
+
+function initDraft() {
+  const fmt = FORMATS[state.format];
+  state.step = 0;
+  state.amberBans = [];
+  state.sapphireBans = [];
+  state.amberPicks = [];
+  state.sapphirePicks = [];
+  state.history = [];
+
+  document.getElementById('amberTitle').textContent = state.amberName;
+  document.getElementById('sapphireTitle').textContent = state.sapphireName;
+
+  // Build ban slots
+  buildBanSlots('amberBans', fmt.bansPerTeam);
+  buildBanSlots('sapphireBans', fmt.bansPerTeam);
+
+  // Build pick slots
+  buildPickSlots('amberPicks', fmt.picksPerTeam);
+  buildPickSlots('sapphirePicks', fmt.picksPerTeam);
+
+  // Build hero grid
+  buildHeroGrid();
+  updateUI();
+  startTimer();
+}
+
+function buildBanSlots(containerId, count) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'ban-slot';
+    slot.dataset.index = i;
+    c.appendChild(slot);
+  }
+}
+
+function buildPickSlots(containerId, count) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'pick-slot';
+    slot.dataset.index = i;
+    slot.innerHTML = '<span class="slot-label">Pick ' + (i+1) + '</span>';
+    c.appendChild(slot);
+  }
+}
+
+function buildHeroGrid() {
+  const grid = document.getElementById('heroGrid');
+  grid.innerHTML = '';
+  const sorted = [...HEROES].sort((a,b) => a.name.localeCompare(b.name));
+  sorted.forEach(hero => {
+    const card = document.createElement('div');
+    card.className = 'hero-card';
+    card.dataset.hero = hero.name;
+    card.innerHTML = `<img src="${hero.icon}" alt="${hero.name}" loading="lazy"><span class="name">${hero.name}</span>`;
+    card.onclick = () => selectHero(hero.name);
+    grid.appendChild(card);
+  });
+}
+
+function getFormat() { return FORMATS[state.format]; }
+function getCurrentStep() {
+  const fmt = getFormat();
+  if (state.step >= fmt.sequence.length) return null;
+  return fmt.sequence[state.step];
+}
+
+function allTaken() {
+  return [...state.amberBans, ...state.sapphireBans, ...state.amberPicks, ...state.sapphirePicks];
+}
+
+function selectHero(heroName) {
+  const step = getCurrentStep();
+  if (!step) return;
+  if (allTaken().includes(heroName)) return;
+
+  // Save state for undo
+  state.history.push({
+    step: state.step,
+    amberBans: [...state.amberBans],
+    sapphireBans: [...state.sapphireBans],
+    amberPicks: [...state.amberPicks],
+    sapphirePicks: [...state.sapphirePicks],
+  });
+
+  if (step.type === 'ban') {
+    if (step.team === 'amber') state.amberBans.push(heroName);
+    else state.sapphireBans.push(heroName);
+  } else {
+    if (step.team === 'amber') state.amberPicks.push(heroName);
+    else state.sapphirePicks.push(heroName);
+  }
+
+  state.step++;
+  updateUI();
+  resetTimer();
+}
+
+function undoAction() {
+  if (state.history.length === 0) return;
+  const prev = state.history.pop();
+  state.step = prev.step;
+  state.amberBans = prev.amberBans;
+  state.sapphireBans = prev.sapphireBans;
+  state.amberPicks = prev.amberPicks;
+  state.sapphirePicks = prev.sapphirePicks;
+  updateUI();
+  resetTimer();
+}
+
+function resetDraft() {
+  clearInterval(state.timerInterval);
+  document.getElementById('timer').textContent = '';
+  document.getElementById('setup').classList.remove('hidden');
+}
+
+function getHeroIcon(name) {
+  const h = HEROES.find(h => h.name === name);
+  return h ? h.icon : '';
+}
+
+function updateUI() {
+  const fmt = getFormat();
+  const step = getCurrentStep();
+  const taken = allTaken();
+
+  // Phase banner
+  const banner = document.getElementById('phaseBanner');
+  if (!step) {
+    banner.textContent = 'Draft Complete';
+    banner.className = 'phase-banner done';
+    clearInterval(state.timerInterval);
+    document.getElementById('timer').textContent = '';
+  } else {
+    const teamName = step.team === 'amber' ? state.amberName : state.sapphireName;
+    const action = step.type === 'ban' ? 'Ban' : 'Pick';
+    banner.textContent = `${teamName} — ${action}`;
+    banner.className = 'phase-banner team-' + step.team;
+  }
+
+  // Ban slots
+  updateBanSlots('amberBans', state.amberBans, step);
+  updateBanSlots('sapphireBans', state.sapphireBans, step);
+
+  // Pick slots
+  updatePickSlots('amberPicks', state.amberPicks, step, 'amber');
+  updatePickSlots('sapphirePicks', state.sapphirePicks, step, 'sapphire');
+
+  // Hero grid
+  document.querySelectorAll('.hero-card').forEach(card => {
+    const name = card.dataset.hero;
+    card.classList.remove('picked', 'banned', 'picked-amber', 'picked-sapphire');
+    if (state.amberBans.includes(name) || state.sapphireBans.includes(name)) {
+      card.classList.add('banned');
+    } else if (state.amberPicks.includes(name)) {
+      card.classList.add('picked', 'picked-amber');
+    } else if (state.sapphirePicks.includes(name)) {
+      card.classList.add('picked', 'picked-sapphire');
+    }
+  });
+
+  filterHeroes();
+}
+
+function updateBanSlots(containerId, bans, currentStep) {
+  const slots = document.getElementById(containerId).querySelectorAll('.ban-slot');
+  const team = containerId.replace('Bans','');
+  slots.forEach((slot, i) => {
+    slot.className = 'ban-slot';
+    slot.innerHTML = '';
+    if (i < bans.length) {
+      slot.classList.add('filled');
+      slot.innerHTML = `<img src="${getHeroIcon(bans[i])}" alt="${bans[i]}">`;
+    } else if (currentStep && currentStep.type === 'ban' && currentStep.team === team && i === bans.length) {
+      slot.classList.add('active');
+    }
+  });
+}
+
+function updatePickSlots(containerId, picks, currentStep, team) {
+  const slots = document.getElementById(containerId).querySelectorAll('.pick-slot');
+  slots.forEach((slot, i) => {
+    slot.className = 'pick-slot';
+    if (i < picks.length) {
+      slot.classList.add('filled');
+      slot.innerHTML = `<img src="${getHeroIcon(picks[i])}" alt="${picks[i]}"><span class="hero-name">${picks[i]}</span>`;
+    } else if (currentStep && currentStep.type === 'pick' && currentStep.team === team && i === picks.length) {
+      slot.classList.add('active');
+      slot.innerHTML = '<span class="slot-label">Pick ' + (i+1) + '</span>';
+    } else {
+      slot.innerHTML = '<span class="slot-label">Pick ' + (i+1) + '</span>';
+    }
+  });
+}
+
+function filterHeroes() {
+  const q = document.getElementById('searchBox').value.toLowerCase();
+  document.querySelectorAll('.hero-card').forEach(card => {
+    const name = card.dataset.hero.toLowerCase();
+    if (q && !name.includes(q)) {
+      card.style.display = 'none';
+    } else {
+      card.style.display = '';
+    }
+  });
+}
+
+function startTimer() {
+  state.timerValue = 30;
+  updateTimerDisplay();
+  clearInterval(state.timerInterval);
+  state.timerInterval = setInterval(() => {
+    if (!getCurrentStep()) { clearInterval(state.timerInterval); return; }
+    state.timerValue--;
+    if (state.timerValue < 0) state.timerValue = 0;
+    updateTimerDisplay();
+  }, 1000);
+}
+
+function resetTimer() {
+  state.timerValue = 30;
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timer');
+  if (!getCurrentStep()) { el.textContent = ''; return; }
+  el.textContent = state.timerValue + 's';
+  el.className = 'timer';
+  if (state.timerValue <= 10) el.classList.add('warning');
+  if (state.timerValue <= 5) el.classList.add('critical');
+}
+
+// Keyboard shortcut
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('searchBox').value = '';
+    filterHeroes();
+  }
+});
+</script>
+</body>
+</html>
