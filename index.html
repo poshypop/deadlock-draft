@@ -17,12 +17,12 @@
   /* Header */
   .header {
     text-align: center;
-    padding: 18px 10px 10px;
+    padding: 14px 10px 8px;
     background: linear-gradient(180deg, #12121a 0%, #0a0a0f 100%);
     border-bottom: 1px solid #1a1a2e;
   }
   .header h1 {
-    font-size: 1.6rem;
+    font-size: 1.8rem;
     letter-spacing: 3px;
     text-transform: uppercase;
     color: #c5a44e;
@@ -39,7 +39,7 @@
   .phase-banner {
     text-align: center;
     padding: 10px;
-    font-size: 1rem;
+    font-size: 1.15rem;
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
@@ -67,13 +67,13 @@
 
   /* Team Panels */
   .team-panel {
-    flex: 0 0 200px;
-    padding: 10px;
+    flex: 0 0 230px;
+    padding: 12px;
     overflow-y: auto;
     min-height: 0;
   }
   .team-panel h2 {
-    font-size: 0.85rem;
+    font-size: 1rem;
     text-transform: uppercase;
     letter-spacing: 2px;
     padding-bottom: 8px;
@@ -87,12 +87,12 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 5px 8px;
-    margin-bottom: 4px;
-    border-radius: 4px;
+    padding: 6px 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
     background: #111118;
     border: 1px solid #1a1a2e;
-    min-height: 40px;
+    min-height: 44px;
     transition: all 0.2s;
   }
   .pick-slot.active {
@@ -107,17 +107,17 @@
     border-color: #2a2a3e;
   }
   .pick-slot img {
-    width: 30px;
-    height: 30px;
+    width: 34px;
+    height: 34px;
     border-radius: 4px;
   }
   .pick-slot .slot-label {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     color: #444;
     text-transform: uppercase;
   }
   .pick-slot .hero-name {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     font-weight: 600;
   }
   .team-amber .hero-name { color: #c5a44e; }
@@ -125,7 +125,7 @@
 
   /* Ban Slots */
   .ban-section h3 {
-    font-size: 0.65rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 1px;
     color: #555;
@@ -137,8 +137,8 @@
     flex-wrap: wrap;
   }
   .ban-slot {
-    width: 34px;
-    height: 34px;
+    width: 40px;
+    height: 40px;
     border-radius: 4px;
     background: #111118;
     border: 1px solid #1a1a2e;
@@ -199,10 +199,10 @@
     background: #111118;
     border: 1px solid #1a1a2e;
     color: #e0e0e0;
-    padding: 5px 12px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    width: 180px;
+    padding: 6px 14px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    width: 200px;
     outline: none;
   }
   .search-box:focus { border-color: #333; }
@@ -224,7 +224,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 4px 2px;
+    padding: 6px 4px;
     border-radius: 5px;
     background: #111118;
     border: 1px solid #1a1a2e;
@@ -238,13 +238,13 @@
     transform: translateY(-1px);
   }
   .hero-card img {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     border-radius: 5px;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
   }
   .hero-card .name {
-    font-size: 0.55rem;
+    font-size: 0.65rem;
     text-align: center;
     color: #aaa;
     line-height: 1.1;
@@ -281,13 +281,13 @@
     border-top: 1px solid #1a1a2e;
   }
   .btn {
-    padding: 8px 24px;
+    padding: 10px 28px;
     border: 1px solid #1a1a2e;
     background: #111118;
     color: #aaa;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -358,16 +358,6 @@
   .team-names .sapphire-input { border-color: #4e8bc544; }
   .team-names .sapphire-input:focus { border-color: #4e8bc5; }
 
-  /* Timer */
-  .timer {
-    font-size: 1.8rem;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    margin-top: -4px;
-  }
-  .timer.warning { color: #c5a44e; }
-  .timer.critical { color: #c53030; animation: pulse 0.5s infinite alternate; }
-  @keyframes pulse { to { opacity: 0.5; } }
 
   /* Responsive */
   @media (max-width: 900px) {
@@ -423,10 +413,7 @@
   <div class="hero-pool-container">
     <div class="pool-header">
       <h3>Hero Pool</h3>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <span class="timer" id="timer"></span>
-        <input type="text" class="search-box" id="searchBox" placeholder="Search heroes..." oninput="filterHeroes()">
-      </div>
+      <input type="text" class="search-box" id="searchBox" placeholder="Search heroes..." oninput="filterHeroes()">
     </div>
     <div class="hero-grid" id="heroGrid"></div>
   </div>
@@ -534,8 +521,6 @@ let state = {
   history: [],
   amberName: 'Amber',
   sapphireName: 'Sapphire',
-  timerValue: 30,
-  timerInterval: null,
 };
 
 function startDraft() {
@@ -568,7 +553,6 @@ function initDraft() {
   // Build hero grid
   buildHeroGrid();
   updateUI();
-  startTimer();
 }
 
 function buildBanSlots(containerId, count) {
@@ -643,7 +627,6 @@ function selectHero(heroName) {
 
   state.step++;
   updateUI();
-  resetTimer();
 }
 
 function undoAction() {
@@ -655,12 +638,9 @@ function undoAction() {
   state.amberPicks = prev.amberPicks;
   state.sapphirePicks = prev.sapphirePicks;
   updateUI();
-  resetTimer();
 }
 
 function resetDraft() {
-  clearInterval(state.timerInterval);
-  document.getElementById('timer').textContent = '';
   document.getElementById('setup').classList.remove('hidden');
 }
 
@@ -679,8 +659,6 @@ function updateUI() {
   if (!step) {
     banner.textContent = 'Draft Complete';
     banner.className = 'phase-banner done';
-    clearInterval(state.timerInterval);
-    document.getElementById('timer').textContent = '';
   } else {
     const teamName = step.team === 'amber' ? state.amberName : state.sapphireName;
     const action = step.type === 'ban' ? 'Ban' : 'Pick';
@@ -753,32 +731,6 @@ function filterHeroes() {
       card.style.display = '';
     }
   });
-}
-
-function startTimer() {
-  state.timerValue = 30;
-  updateTimerDisplay();
-  clearInterval(state.timerInterval);
-  state.timerInterval = setInterval(() => {
-    if (!getCurrentStep()) { clearInterval(state.timerInterval); return; }
-    state.timerValue--;
-    if (state.timerValue < 0) state.timerValue = 0;
-    updateTimerDisplay();
-  }, 1000);
-}
-
-function resetTimer() {
-  state.timerValue = 30;
-  updateTimerDisplay();
-}
-
-function updateTimerDisplay() {
-  const el = document.getElementById('timer');
-  if (!getCurrentStep()) { el.textContent = ''; return; }
-  el.textContent = state.timerValue + 's';
-  el.className = 'timer';
-  if (state.timerValue <= 10) el.classList.add('warning');
-  if (state.timerValue <= 5) el.classList.add('critical');
 }
 
 // Keyboard shortcut
