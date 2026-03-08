@@ -378,7 +378,7 @@
     <div class="format-info">
       <div class="fmt-desc" style="color:#888;font-size:0.75rem;margin-bottom:16px;">
         Competitive format: 2 bans per team, 6 picks per team<br>
-        Ban 1 &rarr; Picks 1-4 &rarr; Ban 2 &rarr; Picks 5-6
+        Ban 1 &rarr; Picks 1-3 &rarr; Ban 2 &rarr; Picks 4-6
       </div>
     </div>
     <button class="btn btn-start" onclick="startDraft()">Start Draft</button>
@@ -488,24 +488,25 @@ const FORMATS = {
       // Ban Phase 1
       { type:'ban', team:'amber' },
       { type:'ban', team:'sapphire' },
-      // Pick Phase 1: A-SS-A
+      // Pick Phase 1: A-SS-A (picks 1-2 each)
       { type:'pick', team:'amber' },
       { type:'pick', team:'sapphire' },
       { type:'pick', team:'sapphire' },
       { type:'pick', team:'amber' },
-      // Pick Phase 2: A-SS-A
+      // Pick Phase 2: A-S (pick 3 each)
       { type:'pick', team:'amber' },
       { type:'pick', team:'sapphire' },
-      { type:'pick', team:'sapphire' },
-      { type:'pick', team:'amber' },
-      // Ban Phase 2 (reversed order)
+      // Ban Phase 2 (reversed order - after each team has 3 picks)
       { type:'ban', team:'sapphire' },
       { type:'ban', team:'amber' },
-      // Pick Phase 3: S-AA-S
+      // Pick Phase 3: S-AA-S (picks 4-6)
       { type:'pick', team:'sapphire' },
       { type:'pick', team:'amber' },
       { type:'pick', team:'amber' },
       { type:'pick', team:'sapphire' },
+      // Pick Phase 4: S-A (picks 6)
+      { type:'pick', team:'sapphire' },
+      { type:'pick', team:'amber' },
     ]
   }
 };
