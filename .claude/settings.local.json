@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:deadlock.wiki)",
+      "WebSearch",
+      "Bash(gh auth:*)",
+      "Bash(gh repo:*)",
+      "Bash(gh api:*)",
+      "Bash(gh run:*)",
+      "WebFetch(domain:boom.tv)",
+      "WebFetch(domain:medium.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:deadlockdraft.com)",
+      "WebFetch(domain:liquipedia.net)",
+      "WebFetch(domain:www.challengermode.com)",
+      "WebFetch(domain:deadlock.pro.br)",
+      "WebFetch(domain:statlocker.gg)",
+      "WebFetch(domain:forums.playdeadlock.com)",
+      "WebFetch(domain:thegamehaus.com)",
+      "WebFetch(domain:www.pcgamer.com)",
+      "WebFetch(domain:raw.githubusercontent.com)"
+    ]
+  }
+}

@@ -319,32 +319,8 @@
     font-size: 0.8rem;
     margin-bottom: 20px;
   }
-  .format-options {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+  .format-info {
     margin-bottom: 20px;
-  }
-  .format-option {
-    padding: 12px 16px;
-    background: #0a0a0f;
-    border: 1px solid #1a1a2e;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.15s;
-    text-align: left;
-  }
-  .format-option:hover { border-color: #333; }
-  .format-option.selected { border-color: #c5a44e; background: #14130f; }
-  .format-option .fmt-title {
-    font-weight: 600;
-    font-size: 0.85rem;
-    color: #ddd;
-  }
-  .format-option .fmt-desc {
-    font-size: 0.7rem;
-    color: #666;
-    margin-top: 2px;
   }
   .team-names {
     display: flex;
@@ -399,18 +375,10 @@
       <input type="text" class="amber-input" id="amberName" placeholder="Amber Team" maxlength="20">
       <input type="text" class="sapphire-input" id="sapphireName" placeholder="Sapphire Team" maxlength="20">
     </div>
-    <div class="format-options">
-      <div class="format-option selected" data-format="standard" onclick="selectFormat(this)">
-        <div class="fmt-title">Standard Draft</div>
-        <div class="fmt-desc">4 bans per team, 6 picks per team (1-2-2-1 snake)</div>
-      </div>
-      <div class="format-option" data-format="quick" onclick="selectFormat(this)">
-        <div class="fmt-title">Quick Draft</div>
-        <div class="fmt-desc">2 bans per team, 6 picks per team</div>
-      </div>
-      <div class="format-option" data-format="nobans" onclick="selectFormat(this)">
-        <div class="fmt-title">No Bans</div>
-        <div class="fmt-desc">Just picks, 6 per team (snake order)</div>
+    <div class="format-info">
+      <div class="fmt-desc" style="color:#888;font-size:0.75rem;margin-bottom:16px;">
+        Competitive format: 2 bans per team, 6 picks per team<br>
+        Ban 1 &rarr; Picks 1-4 &rarr; Ban 2 &rarr; Picks 5-6
       </div>
     </div>
     <button class="btn btn-start" onclick="startDraft()">Start Draft</button>
@@ -509,53 +477,35 @@ const HEROES = [
   { name: "Yamato", icon: "https://deadlock.wiki/images/6/64/Yamato.png" },
 ];
 
-// Draft formats: sequence of { type: 'ban'|'pick', team: 'amber'|'sapphire' }
+// Competitive Deadlock draft format:
+// Ban Phase 1 -> Pick Phase 1 (1-2-1) -> Pick Phase 2 (1-2-1) -> Ban Phase 2 -> Pick Phase 3 (1-2-1)
+// 2 bans per team, 6 picks per team
 const FORMATS = {
   standard: {
-    bansPerTeam: 4,
-    picksPerTeam: 6,
-    sequence: [
-      // Ban phase 1: alternating
-      { type:'ban', team:'amber' }, { type:'ban', team:'sapphire' },
-      { type:'ban', team:'amber' }, { type:'ban', team:'sapphire' },
-      // Pick phase 1: 1-2-2-1
-      { type:'pick', team:'amber' }, { type:'pick', team:'sapphire' },
-      { type:'pick', team:'sapphire' }, { type:'pick', team:'amber' },
-      // Ban phase 2
-      { type:'ban', team:'amber' }, { type:'ban', team:'sapphire' },
-      { type:'ban', team:'amber' }, { type:'ban', team:'sapphire' },
-      // Pick phase 2: 2-2
-      { type:'pick', team:'amber' }, { type:'pick', team:'amber' },
-      { type:'pick', team:'sapphire' }, { type:'pick', team:'sapphire' },
-      // Pick phase 3: 2-2
-      { type:'pick', team:'sapphire' }, { type:'pick', team:'sapphire' },
-      { type:'pick', team:'amber' }, { type:'pick', team:'amber' },
-    ]
-  },
-  quick: {
     bansPerTeam: 2,
     picksPerTeam: 6,
     sequence: [
-      { type:'ban', team:'amber' }, { type:'ban', team:'sapphire' },
-      { type:'ban', team:'amber' }, { type:'ban', team:'sapphire' },
-      { type:'pick', team:'amber' }, { type:'pick', team:'sapphire' },
-      { type:'pick', team:'sapphire' }, { type:'pick', team:'amber' },
-      { type:'pick', team:'amber' }, { type:'pick', team:'sapphire' },
-      { type:'pick', team:'sapphire' }, { type:'pick', team:'amber' },
-      { type:'pick', team:'amber' }, { type:'pick', team:'sapphire' },
-      { type:'pick', team:'sapphire' }, { type:'pick', team:'amber' },
-    ]
-  },
-  nobans: {
-    bansPerTeam: 0,
-    picksPerTeam: 6,
-    sequence: [
-      { type:'pick', team:'amber' }, { type:'pick', team:'sapphire' },
-      { type:'pick', team:'sapphire' }, { type:'pick', team:'amber' },
-      { type:'pick', team:'amber' }, { type:'pick', team:'sapphire' },
-      { type:'pick', team:'sapphire' }, { type:'pick', team:'amber' },
-      { type:'pick', team:'amber' }, { type:'pick', team:'sapphire' },
-      { type:'pick', team:'sapphire' }, { type:'pick', team:'amber' },
+      // Ban Phase 1
+      { type:'ban', team:'amber' },
+      { type:'ban', team:'sapphire' },
+      // Pick Phase 1: A-SS-A
+      { type:'pick', team:'amber' },
+      { type:'pick', team:'sapphire' },
+      { type:'pick', team:'sapphire' },
+      { type:'pick', team:'amber' },
+      // Pick Phase 2: A-SS-A
+      { type:'pick', team:'amber' },
+      { type:'pick', team:'sapphire' },
+      { type:'pick', team:'sapphire' },
+      { type:'pick', team:'amber' },
+      // Ban Phase 2 (reversed order)
+      { type:'ban', team:'sapphire' },
+      { type:'ban', team:'amber' },
+      // Pick Phase 3: S-AA-S
+      { type:'pick', team:'sapphire' },
+      { type:'pick', team:'amber' },
+      { type:'pick', team:'amber' },
+      { type:'pick', team:'sapphire' },
     ]
   }
 };
@@ -573,12 +523,6 @@ let state = {
   timerValue: 30,
   timerInterval: null,
 };
-
-function selectFormat(el) {
-  document.querySelectorAll('.format-option').forEach(e => e.classList.remove('selected'));
-  el.classList.add('selected');
-  state.format = el.dataset.format;
-}
 
 function startDraft() {
   state.amberName = document.getElementById('amberName').value || 'Amber';
